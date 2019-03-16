@@ -35,7 +35,7 @@ import pickle
 
 
 
-wokao
+
 # TRAIN_CSV = '..../train.csv'
 # TRAIN_CSV = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/CLONE_PAIRS_FULL.csv'
 # TRAIN_PAIRS_JSON_FILE = "/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/TRAIN_PAIRS_JSON_FILE.json"
