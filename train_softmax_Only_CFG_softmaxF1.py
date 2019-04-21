@@ -35,14 +35,13 @@ from keras.models import load_model
 import datetime
 import pickle
 # TRAIN_CSV = '..../train.csv'
-TRAIN_CSV = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/CLONE_PAIRS_FULL.csv'
-TRAIN_PAIRS_JSON_FILE = "/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/TRAIN_PAIRS_JSON_FILE.json"
+
+TRAIN_CSV = 'C:\\work\\codeclone_data\\preprocessDataFromDB\\CLONE_PAIRS_FULL.csv'
+TRAIN_PAIRS_JSON_FILE = "C:\\work\\codeclone_data\\TRAIN_PAIRS_JSON_FILE.json"
 # TEST_CSV = '..../test.csv'
-CFG_EMBEDDING_FILE = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/code_clone_embedding_for_CFG_model.txt'
-SOURCE_CODE_EMBEDDING_FILE = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/train_xe.java.code.gz'
-#MODEL_SAVING_DIR = 'C:\\work\\codeclone_data\\save_model\\'
-FIG_SAVING_DIR='/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/result/figures/'
-MODEL_SAVING_DIR='/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/result/models/'
+CFG_EMBEDDING_FILE = 'C:\\work\\codeclone_data\\code_clone_embedding_for_CFG_model.txt'
+SOURCE_CODE_EMBEDDING_FILE = 'C:\\work\\codeclone_data\\train_xe.java.code.gz'
+MODEL_SAVING_DIR = 'C:\\work\\codeclone_data\\save_model\\'
 is_dot_file = 'is_dot_file'
 target_java_named_folder = 'target_java_named_folder'
 target_java_file = 'target_java_file'
@@ -53,8 +52,46 @@ bcb_reduced_java_named_files = 'bcb_reduced_java_named_files'
 code_dot_data_cfg_generated = "C:\\work\\codeclone_data\\preprocessDataFromDB\\code_dot_data_cfg_generated.csv"
 clone_pairs_file = "C:\\work\\codeclone_data\\preprocessDataFromDB\\CLONE_PAIRS_FULL.csv"
 save_source_code_file = 'save_source_java_code_txt_data.txt'
+#MODEL_SAVING_DIR='/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/result/models/'
 
-#
+
+
+#TRAIN_CSV = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/CLONE_PAIRS_FULL.csv'
+#TRAIN_PAIRS_JSON_FILE = "/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/TRAIN_PAIRS_JSON_FILE.json"
+## TEST_CSV = '..../test.csv'
+#CFG_EMBEDDING_FILE = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/code_clone_embedding_for_CFG_model.txt'
+#SOURCE_CODE_EMBEDDING_FILE = '/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/train_xe.java.code.gz'
+##MODEL_SAVING_DIR = 'C:\\work\\codeclone_data\\save_model\\'
+#FIG_SAVING_DIR='/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/result/figures/'
+#MODEL_SAVING_DIR='/home/wehua/PycharmProjects/code_clone/code_clone/code_clone_detections/codeclone_data/result/models/'
+#is_dot_file = 'is_dot_file'
+#target_java_named_folder = 'target_java_named_folder'
+#target_java_file = 'target_java_file'
+#dot_file_list = 'dot_file_list'
+#bcb_reduced_dotfiles = 'bcb_reduced_dotfiles'
+#bcb_reduced_java_named_files = 'bcb_reduced_java_named_files'
+
+#code_dot_data_cfg_generated = "C:\\work\\codeclone_data\\preprocessDataFromDB\\code_dot_data_cfg_generated.csv"
+#clone_pairs_file = "C:\\work\\codeclone_data\\preprocessDataFromDB\\CLONE_PAIRS_FULL.csv"
+#save_source_code_file = 'save_source_java_code_txt_data.txt'
+
+def classifaction_report_csv(report, csvfile):
+    report_data = []
+    lines = report.split('\n')
+    for line in lines[2:-3]:
+        row = {}
+        row_data = line.split('      ')
+        row['class'] = row_data[1]
+        row['precision'] = float(row_data[2])
+        row['recall'] = float(row_data[3])
+        row['f1_score'] = float(row_data[4])
+        row['support'] = float(row_data[5])
+        report_data.append(row)
+    dataframe = pd.DataFrame.from_dict(report_data)
+    dataframe.to_csv(csvfile, index = False)
+
+
+
 def precision(y_true, y_pred):
     """Precision metric.
 
@@ -355,7 +392,7 @@ def text_to_word_list(text):
     return text
 
 
-samples_number = 54000
+samples_number = 500
 
 validation_percent = 0.2
 test_percent = 0.2
@@ -577,7 +614,10 @@ for i in range(len(malstm.metrics_names)):
     print("%s: %.2f%%" % (malstm.metrics_names[i], scores[i]))
 
 y_pred = malstm.predict( [X_test['cfg_A'],X_test['cfg_B']])
-print(classification_report(Y_test, np.argmax(y_pred,1)))
+report=classification_report(Y_test, np.argmax(y_pred,1))
+print(report)
+csvfile=MODEL_SAVING_DIR+'classification_report_only_cfg.csv'
+classifaction_report_csv(report, csvfile)
 # Plot accuracy
 # plt.plot(malstm_trained.history['categorical_accuracy'])
 # plt.plot(malstm_trained.history['val_categorical_accuracy'])

@@ -728,13 +728,13 @@ plot_history(malstm_trained)
 
 
 
-# malstm_trained_json=malstm_trained.model.to_json()
-# modelname=MODEL_SAVING_DIR+str(datetime.datetime.now())+'cfg+txt.model.json'
-# with open(modelname,"w") as json_file:
-#     json_file.write(malstm_trained_json)
-# modelwightname=MODEL_SAVING_DIR+str(datetime.datetime.now())+'cfg+txt_only.model.h5'
-# malstm_trained.model.save_weights(modelwightname)
-# print("savemodel to disk")
+ malstm_trained_json=malstm_trained.model.to_json()
+ modelname=MODEL_SAVING_DIR+str(datetime.datetime.now())+'cfg+txt.model.json'
+ with open(modelname,"w") as json_file:
+     json_file.write(malstm_trained_json)
+ modelwightname=MODEL_SAVING_DIR+str(datetime.datetime.now())+'cfg+txt_only.model.h5'
+ malstm_trained.model.save_weights(modelwightname)
+ print("savemodel to disk")
 
 # load json and create model
 # json_loaded=open(modelname,'r')

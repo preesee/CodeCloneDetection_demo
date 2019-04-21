@@ -72,7 +72,13 @@ clone_pairs_file = "C:\\work\\codeclone_data\\preprocessDataFromDB\\CLONE_PAIRS_
 save_source_code_file = 'save_source_java_code_txt_data.txt'
 
 
-#
+
+def threshold_accuracy(y_true, y_pred):
+    threshold = 0.80
+    if K.backend() == 'tensorflow':
+        return K.mean(K.equal(y_true, K.tf.cast(K.lesser(y_pred,threshold), y_true.dtype)))
+    else:
+        return K.mean(K.equal(y_true, K.lesser(y_pred,threshold)))
 def precision(y_true, y_pred):
     """Precision metric.
 
@@ -293,6 +299,13 @@ label_data_convertor['T2'] = 1
 label_data_convertor['T1'] = 0
 label_data_convertor['MT3'] = 2
 label_data_convertor['ST3'] = 3
+
+label_simb_data_convertor = {}
+label_simb_data_convertor['T4'] = 4
+label_simb_data_convertor['T2'] = 1
+label_simb_data_convertor['T1'] = 0
+label_simb_data_convertor['MT3'] = 2
+label_simb_data_convertor['ST3'] = 3
 data_loaded = json.load(open(TRAIN_PAIRS_JSON_FILE))
 
 datarowsT4 = [row for row in data_loaded if row['TYPE'] == 'T4']
@@ -319,7 +332,7 @@ def source_code_to_tokens(text):
     return tokens
 
 
-samples_number = 50000
+samples_number = 1000
 
 validation_percent = 0.2
 test_percent = 0.2
@@ -401,35 +414,32 @@ X = train_df[code_clones_cols]
 # Y = train_df.TYPE.map(lambda x: label_data_convertor[x])
 # Y_test = test_df.TYPE.map(lambda x: label_data_convertor[x])
 Y = train_df.sim_score
+Z=train_df.TYPE.map(lambda x: label_data_convertor[x])
 
 # cfg_pair = {'cfg_left': train_df.cfg_idx_A, 'cfg_right': train_df.cfg_idx_B}
 X_train, X_validation, Y_train, Y_validation = train_test_split(
     X, Y, test_size=validation_size)
 
-X_train, X_test, Y_train, Y_test = train_test_split(
-    X, Y, test_size=validation_size)
+X_train, X_test, Y_train, Y_test, Z_train,Z_test= train_test_split(
+    X, Y,Z, test_size=validation_size)
 
 # Split to dicts
 X_train = {'left': X_train.code_clone1, 'right': X_train.code_clone2,
-           # 'cfg_A': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_A_train.values]),
-           # 'cfg_A': [doc2vec_cfg.docvecs[cfg] for cfg in cfg_idx_A_train],
-           # 'cfg_A': cfg_idx_A_train,
-           # 'cfg_B': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_B_train.values])
-           }  # 'cfg_A': [doc2vec_cfg.docvecs[cfg] for cfg in cfg_idx_A_train],
+
+           } 
 
 X_validation = {'left': X_validation.code_clone1, 'right': X_validation.code_clone2,
-                # 'cfg_A': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_A_validation.values]),
-                # 'cfg_B': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_B_validation.values])
+
                 }
 X_test = {'left': X_test.code_clone1, 'right': X_test.code_clone2,
-          # 'cfg_A': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_A_test.values]),
-          # 'cfg_B': pd.Series([cfg_doc_dict[cfg] for cfg in cfg_idx_B_test.values])
+
           }
 
 # Convert labels to their numpy representations
 Y_train = Y_train.values
 Y_validation = Y_validation.values
 Y_test = Y_test.values
+Z_test = Z_test.values
 # Y_test=Y_test.values
 # Zero padding
 for dataset, side in itertools.product([X_train, X_validation, X_test], ['left', 'right']):
